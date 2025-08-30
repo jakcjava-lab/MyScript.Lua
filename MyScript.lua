@@ -1,113 +1,51 @@
---// Services
-local Players = game:GetService("Players")
-local UIS = game:GetService("UserInputService")
-local Camera = game:GetService("Workspace").CurrentCamera
-local LocalPlayer = Players.LocalPlayer
+-- Detect LocalPlayer + Character
+local player = game.Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
 
---// Killer list
-local Killers = {
-   ["coolkidd"] = true,
-   ["1x1x1x1"] = true,
-   ["noli"] = true,
-   ["jason"] = true,
-   ["slasher"] = true,
-   ["john doe"] = true,
-}
-
---// Rayfield Loader
-local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-
+-- Rayfield Setup (you already have this part)
 local Window = Rayfield:CreateWindow({
-   Name = "Forsaken GUI",
-   LoadingTitle = "Forsaken Script",
-   LoadingSubtitle = "By jakcjava",
-   ConfigurationSaving = {
-      Enabled = false
-   },
-   Discord = {
-      Enabled = false
-   }
+    Name = "Forsaken - Chance Tools",
+    LoadingTitle = "Forsaken Hub",
+    LoadingSubtitle = "by jakcjava",
+    ConfigurationSaving = {
+       Enabled = true,
+       FolderName = "ForsakenHub",
+       FileName = "ChanceConfig"
+    }
 })
 
---// Main Tab
-local MainTab = Window:CreateTab("Main", 4483362458)
+-- Add tab for Chance
+local ChanceTab = Window:CreateTab("Chance Mode", 4483362458)
 
--- Aimbot Toggle
-MainTab:CreateToggle({
-   Name = "Aimbot (Killer Only)",
-   CurrentValue = false,
-   Flag = "AimbotToggle",
-   Callback = function(Value)
-      getgenv().AimbotEnabled = Value
-      print("Aimbot Enabled: " .. tostring(Value))
-   end,
-})
-
--- Silent Trickshot Toggle
-MainTab:CreateToggle({
-   Name = "360 Silent Trickshot",
-   CurrentValue = false,
-   Flag = "SilentTrickshot",
-   Callback = function(Value)
-      getgenv().SilentTrickshot = Value
-      print("Silent Trickshot Enabled: " .. tostring(Value))
-   end,
-})
-
--- Trickshot Chance Slider
-MainTab:CreateSlider({
-   Name = "Trickshot Chance %",
-   Range = {0, 100},
-   Increment = 5,
-   Suffix = "%",
-   CurrentValue = 50,
-   Flag = "TrickshotChance",
-   Callback = function(Value)
-      getgenv().TrickshotChance = Value
-   end,
-})
-
---// Aim Function
-function AimAt(part)
-   if part and part.Position then
-      Camera.CFrame = CFrame.new(Camera.CFrame.Position, part.Position)
-   end
-end
-
---// Shooting Listener
-UIS.InputBegan:Connect(function(input, gp)
-   if gp then return end
-   if input.UserInputType == Enum.UserInputType.MouseButton1 then
-      local closest, dist = nil, math.huge
-      for _, player in pairs(Players:GetPlayers()) do
-         if player ~= LocalPlayer and Killers[string.lower(player.Name)] then
-            if player.Character and player.Character:FindFirstChild("Head") then
-               local head = player.Character.Head
-               local mag = (head.Position - Camera.CFrame.Position).Magnitude
-               if mag < dist then
-                  closest, dist = head, mag
-               end
-            end
-         end
-      end
-
-      if closest then
-         if getgenv().SilentTrickshot then
-            if math.random(1,100) <= (getgenv().TrickshotChance or 50) then
-               local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-               if hrp then
-                  for i = 1, 12 do -- 12x30° = full spin
-                     hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(30), 0)
-                     task.wait(0.02)
-                  end
-               end
-               AimAt(closest)
+-- Check if the character is Chance
+if char.Name == "Chance" then
+    -- Add Aimbot + 360 Trickshot buttons
+    local AimbotToggle = ChanceTab:CreateToggle({
+        Name = "Enable Aimbot",
+        CurrentValue = false,
+        Flag = "ChanceAimbot",
+        Callback = function(Value)
+            if Value then
+                print("Aimbot Enabled for Chance")
+                -- put your aimbot logic here
             else
-               AimAt(closest)
+                print("Aimbot Disabled")
             end
-         elseif getgenv().AimbotEnabled then
-            AimAt(closest)
-         end
-      end
-   end
-end)
+        end,
+    })
+
+    local TrickshotBtn = ChanceTab:CreateButton({
+        Name = "Do 360 Trickshot",
+        Callback = function()
+            print("Performing 360 trickshot!")
+            local hrp = char:WaitForChild("HumanoidRootPart")
+            for i = 1, 36 do
+                hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(10), 0)
+                task.wait()
+            end
+            -- fire flintlock shot here
+        end,
+    })
+else
+    ChanceTab:CreateParagraph({Title = "Notice", Content = "You are not Chance, so these features are disabled."})
+end
