@@ -1,1 +1,36 @@
 README.md
+# Title (H1)
+## Subtitle (H2)
+### Smaller subtitle (H3)
+
+**bold text**  
+*italic text*  
+~~strikethrough~~  
+
+- Bullet list item 1  
+- Bullet list item 2  
+
+1. Numbered list item 1  
+2. Numbered list item 2  
+
+`inline code`  
+
+```lua
+-- code block example
+print("Hello World")
+
+---
+
+### 3. Example README for your scripts
+
+```markdown
+# 🎯 Roblox Scripts
+
+Welcome to my script repo!  
+This is where I upload my custom Roblox Lua scripts to load in-game.
+
+## 🚀 Usage
+Run this inside your executor:
+
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/<your-username>/<your-repo>/main/MyScript.lua"))()
