@@ -1,69 +1,62 @@
--- Load Rayfield
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
--- Create Window
-local Window = Rayfield:CreateWindow({
-   Name = "My Hub",
-   LoadingTitle = "Loading My Hub",
-   LoadingSubtitle = "by jakcjava-lab",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = nil,
-      FileName = "MyHubConfig"
-   },
-   Discord = {
-      Enabled = false,
-      Invite = "",
-      RememberJoins = true
-   },
-   KeySystem = false,
-   KeySettings = {
-      Title = "My Hub Key",
-      Subtitle = "Key System",
-      Note = "Join Discord for key!",
-      FileName = "MyHubKey",
-      SaveKey = true,
-      GrabKeyFromSite = false,
-      Key = {"ABC123"}
-   }
-})
-
--- 🟢 First Tab
-local MainTab = Window:CreateTab("Main", 4483362458) -- icon id
+-- 🟢 Main Tab
+local MainTab = Window:CreateTab("Main", 4483362458)
 MainTab:CreateSection("Main Features")
 
-MainTab:CreateButton({
-   Name = "Click Me",
-   Callback = function()
-      print("Main Tab Button clicked!")
-   end,
-})
+-- List of killers
+local Killers = {
+   ["coolkid"] = true,
+   ["1x1x1x1"] = true,
+   ["noli"] = true,
+   ["jason"] = true,
+   ["slasher"] = true,
+   ["john doe"] = true,
+}
 
--- 🔵 Second Tab
-local FunTab = Window:CreateTab("Fun", 4483362458)
-FunTab:CreateSection("Fun Stuff")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local UIS = game:GetService("UserInputService")
 
-FunTab:CreateToggle({
-   Name = "Funny Toggle",
+-- Toggle for Aimbot
+MainTab:CreateToggle({
+   Name = "Killer Aimbot (On Shoot)",
    CurrentValue = false,
-   Flag = "Toggle1",
+   Flag = "KillerAimbot",
    Callback = function(Value)
-      print("Funny Toggle is now " .. tostring(Value))
+      getgenv().AimbotEnabled = Value
+      print("Killer Aimbot set to: " .. tostring(Value))
    end,
 })
 
--- 🔴 Third Tab
-local SettingsTab = Window:CreateTab("Settings", 4483362458)
-SettingsTab:CreateSection("Adjustments")
+-- Aimbot function
+local function AimAt(targetPart)
+   if targetPart then
+      Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPart.Position)
+   end
+end
 
-SettingsTab:CreateSlider({
-   Name = "WalkSpeed",
-   Range = {16, 100},
-   Increment = 1,
-   Suffix = "Speed",
-   CurrentValue = 16,
-   Flag = "Slider1",
-   Callback = function(Value)
-      game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
-   end,
-})
+-- Detect mouse click
+UIS.InputBegan:Connect(function(input, gp)
+   if gp then return end
+   if input.UserInputType == Enum.UserInputType.MouseButton1 then
+      if getgenv().AimbotEnabled then
+         -- Find nearest killer
+         local closest, dist = nil, math.huge
+         for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and Killers[string.lower(player.Name)] then
+               if player.Character and player.Character:FindFirstChild("Head") then
+                  local head = player.Character.Head
+                  local mag = (head.Position - Camera.CFrame.Position).Magnitude
+                  if mag < dist then
+                     closest, dist = head, mag
+                  end
+               end
+            end
+         end
+         -- Aim at nearest killer
+         if closest then
+            AimAt(closest)
+         end
+      end
+   end
+end)
