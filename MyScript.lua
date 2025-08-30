@@ -49,3 +49,29 @@ if char.Name == "Chance" then
 else
     ChanceTab:CreateParagraph({Title = "Notice", Content = "You are not Chance, so these features are disabled."})
 end
+-- Add Infinite Stamina toggle to your existing window
+Window:CreateToggle({
+    Name = "Infinite Stamina",
+    CurrentValue = false,
+    Flag = "InfiniteStamina",
+    Callback = function(Value)
+        if Value then
+            _G.InfiniteStamina = true
+            spawn(function()
+                while _G.InfiniteStamina do
+                    local player = game.Players.LocalPlayer
+                    local character = player.Character
+                    if character then
+                        local humanoid = character:FindFirstChild("Humanoid")
+                        if humanoid and humanoid:FindFirstChild("Stamina") then
+                            humanoid.Stamina.Value = humanoid.Stamina.MaxValue
+                        end
+                    end
+                    wait(0.1) -- repeat every 0.1 sec
+                end
+            end)
+        else
+            _G.InfiniteStamina = false
+        end
+    end
+})
