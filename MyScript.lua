@@ -1,4 +1,4 @@
--- Load Rayfield Library
+-- Load Rayfield
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 -- Create Window
@@ -8,15 +8,15 @@ local Window = Rayfield:CreateWindow({
    LoadingSubtitle = "by jakcjava-lab",
    ConfigurationSaving = {
       Enabled = true,
-      FolderName = nil, -- Create a custom folder for your hub configs
+      FolderName = nil,
       FileName = "MyHubConfig"
    },
    Discord = {
       Enabled = false,
-      Invite = "", -- Discord invite code, e.g. "sirius"
+      Invite = "",
       RememberJoins = true
    },
-   KeySystem = false, -- Set to true if you want a key system
+   KeySystem = false,
    KeySettings = {
       Title = "My Hub Key",
       Subtitle = "Key System",
@@ -28,26 +28,42 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
--- Create Tab
+-- 🟢 First Tab
 local MainTab = Window:CreateTab("Main", 4483362458) -- icon id
+MainTab:CreateSection("Main Features")
 
--- Create Section
-local Section = MainTab:CreateSection("Example Features")
-
--- Add Button
 MainTab:CreateButton({
    Name = "Click Me",
    Callback = function()
-      print("Button was clicked!")
+      print("Main Tab Button clicked!")
    end,
 })
 
--- Add Toggle
-MainTab:CreateToggle({
-   Name = "Example Toggle",
+-- 🔵 Second Tab
+local FunTab = Window:CreateTab("Fun", 4483362458)
+FunTab:CreateSection("Fun Stuff")
+
+FunTab:CreateToggle({
+   Name = "Funny Toggle",
    CurrentValue = false,
    Flag = "Toggle1",
    Callback = function(Value)
-      print("Toggle value is: " .. tostring(Value))
+      print("Funny Toggle is now " .. tostring(Value))
+   end,
+})
+
+-- 🔴 Third Tab
+local SettingsTab = Window:CreateTab("Settings", 4483362458)
+SettingsTab:CreateSection("Adjustments")
+
+SettingsTab:CreateSlider({
+   Name = "WalkSpeed",
+   Range = {16, 100},
+   Increment = 1,
+   Suffix = "Speed",
+   CurrentValue = 16,
+   Flag = "Slider1",
+   Callback = function(Value)
+      game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = Value
    end,
 })
