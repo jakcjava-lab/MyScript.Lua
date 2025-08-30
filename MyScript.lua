@@ -1,10 +1,12 @@
--- 🟢 Main Tab
-local MainTab = Window:CreateTab("Main", 4483362458)
-MainTab:CreateSection("Main Features")
+--// Services
+local Players = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local Camera = game:GetService("Workspace").CurrentCamera
+local LocalPlayer = Players.LocalPlayer
 
--- List of killers
+--// Killer list
 local Killers = {
-   ["coolkid"] = true,
+   ["coolkidd"] = true,
    ["1x1x1x1"] = true,
    ["noli"] = true,
    ["jason"] = true,
@@ -12,49 +14,98 @@ local Killers = {
    ["john doe"] = true,
 }
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Camera = workspace.CurrentCamera
-local UIS = game:GetService("UserInputService")
+--// Rayfield Loader
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
--- Toggle for Aimbot
+local Window = Rayfield:CreateWindow({
+   Name = "Forsaken GUI",
+   LoadingTitle = "Forsaken Script",
+   LoadingSubtitle = "By jakcjava",
+   ConfigurationSaving = {
+      Enabled = false
+   },
+   Discord = {
+      Enabled = false
+   }
+})
+
+--// Main Tab
+local MainTab = Window:CreateTab("Main", 4483362458)
+
+-- Aimbot Toggle
 MainTab:CreateToggle({
-   Name = "Killer Aimbot (On Shoot)",
+   Name = "Aimbot (Killer Only)",
    CurrentValue = false,
-   Flag = "KillerAimbot",
+   Flag = "AimbotToggle",
    Callback = function(Value)
       getgenv().AimbotEnabled = Value
-      print("Killer Aimbot set to: " .. tostring(Value))
+      print("Aimbot Enabled: " .. tostring(Value))
    end,
 })
 
--- Aimbot function
-local function AimAt(targetPart)
-   if targetPart then
-      Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPart.Position)
+-- Silent Trickshot Toggle
+MainTab:CreateToggle({
+   Name = "360 Silent Trickshot",
+   CurrentValue = false,
+   Flag = "SilentTrickshot",
+   Callback = function(Value)
+      getgenv().SilentTrickshot = Value
+      print("Silent Trickshot Enabled: " .. tostring(Value))
+   end,
+})
+
+-- Trickshot Chance Slider
+MainTab:CreateSlider({
+   Name = "Trickshot Chance %",
+   Range = {0, 100},
+   Increment = 5,
+   Suffix = "%",
+   CurrentValue = 50,
+   Flag = "TrickshotChance",
+   Callback = function(Value)
+      getgenv().TrickshotChance = Value
+   end,
+})
+
+--// Aim Function
+function AimAt(part)
+   if part and part.Position then
+      Camera.CFrame = CFrame.new(Camera.CFrame.Position, part.Position)
    end
 end
 
--- Detect mouse click
+--// Shooting Listener
 UIS.InputBegan:Connect(function(input, gp)
    if gp then return end
    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-      if getgenv().AimbotEnabled then
-         -- Find nearest killer
-         local closest, dist = nil, math.huge
-         for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and Killers[string.lower(player.Name)] then
-               if player.Character and player.Character:FindFirstChild("Head") then
-                  local head = player.Character.Head
-                  local mag = (head.Position - Camera.CFrame.Position).Magnitude
-                  if mag < dist then
-                     closest, dist = head, mag
-                  end
+      local closest, dist = nil, math.huge
+      for _, player in pairs(Players:GetPlayers()) do
+         if player ~= LocalPlayer and Killers[string.lower(player.Name)] then
+            if player.Character and player.Character:FindFirstChild("Head") then
+               local head = player.Character.Head
+               local mag = (head.Position - Camera.CFrame.Position).Magnitude
+               if mag < dist then
+                  closest, dist = head, mag
                end
             end
          end
-         -- Aim at nearest killer
-         if closest then
+      end
+
+      if closest then
+         if getgenv().SilentTrickshot then
+            if math.random(1,100) <= (getgenv().TrickshotChance or 50) then
+               local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+               if hrp then
+                  for i = 1, 12 do -- 12x30° = full spin
+                     hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(30), 0)
+                     task.wait(0.02)
+                  end
+               end
+               AimAt(closest)
+            else
+               AimAt(closest)
+            end
+         elseif getgenv().AimbotEnabled then
             AimAt(closest)
          end
       end
