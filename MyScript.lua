@@ -1,8 +1,6 @@
--- Delta-ready Forsaken Chance Script
-
--- Load working Rayfield GUI
+-- Load correct Rayfield GUI
 local success, Rayfield = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source", true))()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/mrj500807-beep/Rayfield/main/source.lua", true))()
 end)
 
 if not success then
@@ -14,7 +12,6 @@ local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart")
 
--- Create GUI window
 local Window = Rayfield:CreateWindow({
     Name = "Forsaken - Chance Tools",
     LoadingTitle = "Forsaken Hub",
@@ -22,11 +19,9 @@ local Window = Rayfield:CreateWindow({
     ConfigurationSaving = {Enabled = true, FolderName = "ForsakenHub", FileName = "ChanceConfig"}
 })
 
--- Chance tab
 local ChanceTab = Window:CreateTab("Chance Mode", 4483362458)
 
 if char.Name == "Chance" then
-    -- Aimbot toggle
     ChanceTab:CreateToggle({
         Name = "Enable Aimbot",
         CurrentValue = false,
@@ -40,7 +35,6 @@ if char.Name == "Chance" then
         end,
     })
 
-    -- 360 Trickshot button
     ChanceTab:CreateButton({
         Name = "Do 360 Trickshot",
         Callback = function()
